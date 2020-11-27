@@ -1,0 +1,8 @@
+[submodule "secret-santa"]
+	path = secret-santa
+	url = git@gitlab.com:krup-secret-santa/secret-santa.git
+	branch = master
+[submodule "secret-santa-ui"]
+	path = secret-santa-ui
+	url = git@gitlab.com:krup-secret-santa/secret-santa-ui.git
+	branch = master

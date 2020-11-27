@@ -1,0 +1,63 @@
+version: "3"
+
+services:
+  backend:
+    build: ./secret-santa/
+    container_name: base-app
+    working_dir: /app/secret_santa
+    command: flask run --host 0.0.0.0 --port 8000
+    volumes: ['.:/app']
+    environment:
+      ROOT_PATH_FOR_DYNACONF: ./
+      FLASK_ENV: development
+      FLASK_SQLALCHEMY_DATABASE_URI: mysql+pymysql://$DB_USERNAME:$DB_PASSWORD@db:3306/pmt?charset=utf8mb4
+      FLASK_REDIS_URL: redis://redis:6379
+      FLASK_REDIS_HOST: redis
+    ports:
+      - 8000:8000
+    networks:
+      - base-net
+    links:
+      - db
+
+  frontend:
+    build:
+      context: ./secret-santa-ui/
+    command: npm start
+    ports:
+      - 3000:3000
+    depends_on:
+      - backend
+    environment:
+      - NODE_ENV=production
+      - CHOKIDAR_USEPOLLING=true
+      - REACT_APP_API_URL="http://host.docker.internal:8000/api"
+    stdin_open: true
+
+
+  db:
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: $DB_PASSWORD
+      MYSQL_USER: $DB_USERNAME
+      MYSQL_PASSWORD: $DB_PASSWORD
+      MYSQL_DATABASE: pmt
+    networks:
+      - base-net
+
+  adminer:
+    image: adminer
+    ports:
+      - 9000:8080
+    networks:
+      - base-net
+
+  redis:
+    image: redis
+    hostname: redis
+    networks:
+      - base-net
+
+networks:
+  base-net:
