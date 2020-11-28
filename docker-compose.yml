@@ -2,7 +2,7 @@ version: "3"
 
 services:
   backend:
-    image: secret-santa-backend
+    image: registry.gitlab.com/krup-secret-santa/secret-santa
     working_dir: /app/secret_santa
     command: bash /app/entrypoint.sh
     environment:
@@ -20,7 +20,7 @@ services:
       - db
 
   frontend:
-    image: secret-santa-frontend
+    image: registry.gitlab.com/krup-secret-santa/secret-santa-ui
     command: npm start
     ports:
       - 3000:3000
