@@ -2,14 +2,13 @@ version: "3"
 
 services:
   backend:
-    build: ./secret-santa/
-    container_name: base-app
+    image: secret-santa-backend
     working_dir: /app/secret_santa
-    command: flask run --host 0.0.0.0 --port 8000
-    volumes: ['.:/app']
+    command: bash /app/entrypoint.sh
     environment:
       ROOT_PATH_FOR_DYNACONF: ./
-      FLASK_ENV: development
+      FLASK_ENV: production
+      FLASK_APP: "/app/secret_santa/app.py"
       FLASK_SQLALCHEMY_DATABASE_URI: mysql+pymysql://$DB_USERNAME:$DB_PASSWORD@db:3306/pmt?charset=utf8mb4
       FLASK_REDIS_URL: redis://redis:6379
       FLASK_REDIS_HOST: redis
@@ -21,8 +20,7 @@ services:
       - db
 
   frontend:
-    build:
-      context: ./secret-santa-ui/
+    image: secret-santa-frontend
     command: npm start
     ports:
       - 3000:3000
@@ -33,6 +31,8 @@ services:
       - CHOKIDAR_USEPOLLING=true
       - REACT_APP_API_URL="http://host.docker.internal:8000/api"
     stdin_open: true
+    networks:
+      - base-net
 
 
   db:
